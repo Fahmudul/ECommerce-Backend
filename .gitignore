@@ -1,0 +1,23 @@
+# Operating system files
+Thumbs.db
+.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+.eclipse/
+
+# Build and compilation files
+node_modules/
+build/
+dist/
+.env
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+# Environment files
+.env
