@@ -32,7 +32,6 @@ async function run() {
     app.get("/allproduct", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const category = req.query.category;
-      console.log("from line 35", category);
       if (category) {
         const allProduct = await productsCollection
           .find({ category: category })
@@ -47,7 +46,47 @@ async function run() {
         res.send(allProduct);
       }
     });
-
+    // Searched product api
+    app.get("/products", async (req, res) => {
+      const searchText = req.query.search.toLowerCase();
+      const result = await productsCollection
+        .find({
+          category: { $regex: searchText, $options: "i" },
+        })
+        .toArray();
+      res.send(result);
+    });
+    // Filter product api
+    app.post("/filteredproducts", async (req, res) => {
+      const filter = req.body;
+      // console.log(filter);
+      const { brand, category } = filter;
+      const price = [150, 1300];
+      if (brand.length > 0 && category.length > 0 && price.length > 0) {
+        console.log(brand, category, price);
+        const result = await productsCollection
+          .find({
+            $and: [
+              {
+                $or: brand.map((b) => ({
+                  productName: { $regex: b, $options: "i" },
+                })),
+              },
+              {
+                $or: category.map((c) => ({
+                  category: { $regex: c, $options: "i" },
+                })),
+              },
+              {
+                price: { $gt: price[0], $lte: price[1] },
+              },
+            ],
+          })
+          .toArray();
+        console.log("from line 85", result);
+        res.send(result);
+      }
+    });
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
     });
