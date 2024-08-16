@@ -30,8 +30,22 @@ async function run() {
     const Database = client.db("ECommerce");
     const productsCollection = Database.collection("AllProduct");
     app.get("/allproduct", async (req, res) => {
-      const allProduct = await productsCollection.find().toArray();
-      res.send(allProduct);
+      const limit = parseInt(req.query.limit);
+      const category = req.query.category;
+      console.log("from line 35", category);
+      if (category) {
+        const allProduct = await productsCollection
+          .find({ category: category })
+          .toArray();
+        res.send(allProduct);
+      }
+      if (limit) {
+        const allProduct = await productsCollection
+          .find()
+          .limit(limit)
+          .toArray();
+        res.send(allProduct);
+      }
     });
 
     app.listen(port, () => {
