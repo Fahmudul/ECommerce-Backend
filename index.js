@@ -7,7 +7,11 @@ const port = process.env.PORT || 5000;
 // middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://jobtask-bb93c.web.app",
+      "https://jobtask-bb93c.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
@@ -68,6 +72,7 @@ async function run() {
       // For brand, category and price
       if (brand.length > 0 && category.length > 0 && price.length > 0) {
         console.log(brand, category, price);
+        console.log("from line 75");
         const result = await productsCollection
           .find({
             $and: [
@@ -92,8 +97,39 @@ async function run() {
         // console.log("from line 85", result);
         const productArrayLength = result.length;
         res.send({ result, productArrayLength });
+      } else if (
+        brand.length > 0 ||
+        category.length > 0 ||
+        (price[0] >= 150 && price[1] <= 5000)
+      ) {
+        // / const productArrayLength = await productsCollection.countDocuments();
+        console.log("from line 106");
+        const query = {
+          $or: [
+            ...brand.map((b) => ({
+              productName: { $regex: b, $options: "i" },
+            })),
+            ...category.map((c) => ({
+              category: { $regex: c, $options: "i" },
+            })),
+            { price: { $gt: price[0], $lte: price[1] } },
+          ],
+        };
+        const result = await productsCollection.find(query);
+        const productArrayWithLimit = await result
+          .skip((skip - 1) * limit)
+          .limit(limit)
+          .toArray();
+        // console.log("from line 123", productArray);
+        const productArray = await productsCollection.find(query).toArray();
+        console.log("from line 125", productArray.length);
+        res.send({
+          result: productArrayWithLimit,
+          productArrayLength: productArray.length,
+        });
       } else if (brand.length > 0 && category.length > 0) {
         // For brand and category
+        console.log("from line 102");
         const result = await productsCollection
           .find({
             $and: [
@@ -116,7 +152,7 @@ async function run() {
         res.send({ result, productArrayLength });
       } else if (brand.length > 0 && price.length > 0) {
         // For brand and price
-
+        console.log("from line 125");
         const result = await productsCollection
           .find({
             $and: [
@@ -137,6 +173,7 @@ async function run() {
         res.send({ result, productArrayLength });
       } else if (category.length > 0 && price.length > 0) {
         // For category and price
+        console.log("from line 146");
         const result = await productsCollection
           .find({
             $and: [
@@ -156,7 +193,7 @@ async function run() {
         const productArrayLength = result.length;
         res.send({ result, productArrayLength });
       } else if (price[0] == 0 && price[1] == 90) {
-        console.log("hitting");
+        console.log("from line 194 ");
         const productArrayLength = await productsCollection.countDocuments();
         const result = await productsCollection
           .find()
