@@ -65,8 +65,6 @@ async function run() {
       const filter = req.body;
       const skip = parseInt(req.query.skip);
       const limit = parseInt(req.query.limit);
-      // console.log(skip, limit);
-      // console.log(filter);
       const { brand, category, price } = filter;
       console.log(brand, category, price);
       // For brand, category and price
