@@ -94,8 +94,27 @@ async function run() {
           .skip((skip - 1) * limit)
           .limit(limit)
           .toArray();
+        const result_2 = await productsCollection
+          .find({
+            $and: [
+              {
+                $or: brand.map((b) => ({
+                  productName: { $regex: b, $options: "i" },
+                })),
+              },
+              {
+                $or: category.map((c) => ({
+                  category: { $regex: c, $options: "i" },
+                })),
+              },
+              {
+                price: { $gt: price[0], $lte: price[1] },
+              },
+            ],
+          })
+          .toArray();
         // console.log("from line 85", result);
-        const productArrayLength = result.length;
+        const productArrayLength = result_2.length;
         res.send({ result, productArrayLength });
       } else if (
         brand.length > 0 ||
@@ -148,7 +167,23 @@ async function run() {
           .skip((skip - 1) * limit)
           .limit(limit)
           .toArray();
-        const productArrayLength = result.length;
+        const result_2 = await productsCollection
+          .find({
+            $and: [
+              {
+                $or: brand.map((b) => ({
+                  productName: { $regex: b, $options: "i" },
+                })),
+              },
+              {
+                $or: category.map((c) => ({
+                  category: { $regex: c, $options: "i" },
+                })),
+              },
+            ],
+          })
+          .toArray();
+        const productArrayLength = result_2.length;
         res.send({ result, productArrayLength });
       } else if (brand.length > 0 && price.length > 0) {
         // For brand and price
@@ -169,7 +204,21 @@ async function run() {
           .skip((skip - 1) * limit)
           .limit(limit)
           .toArray();
-        const productArrayLength = result.length;
+        const result_2 = await productsCollection
+          .find({
+            $and: [
+              {
+                $or: brand.map((b) => ({
+                  productName: { $regex: b, $options: "i" },
+                })),
+              },
+              {
+                price: { $gt: price[0], $lt: price[1] },
+              },
+            ],
+          })
+          .toArray();
+        const productArrayLength = result_2.length;
         res.send({ result, productArrayLength });
       } else if (category.length > 0 && price.length > 0) {
         // For category and price
@@ -190,7 +239,21 @@ async function run() {
           .skip((skip - 1) * limit)
           .limit(limit)
           .toArray();
-        const productArrayLength = result.length;
+        const result_2 = await productsCollection
+          .find({
+            $and: [
+              {
+                $or: category.map((c) => ({
+                  category: { $regex: c, $options: "i" },
+                })),
+              },
+              {
+                price: { $gt: price[0], $lt: price[1] },
+              },
+            ],
+          })
+          .toArray();
+        const productArrayLength = result_2.length;
         res.send({ result, productArrayLength });
       } else if (price[0] == 0 && price[1] == 90) {
         console.log("from line 194 ");
